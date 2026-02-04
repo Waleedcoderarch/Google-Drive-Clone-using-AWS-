@@ -1,125 +1,164 @@
-📁 Google Drive Clone (AWS Serverless Project)
+📁 Google Drive Clone Using AWS (Serverless Project)
 📌 Project Overview
 
-This project is a Google Drive–like file viewer built using AWS serverless services.
-Users can view files stored in an Amazon S3 bucket through a Google Drive–style UI built with HTML, CSS, and JavaScript.
+This project is a Google Drive Clone UI where users can view files that are stored in Amazon S3 Cloud Storage.
 
-The main goal of this project is to understand how frontend applications connect to cloud storage using AWS Lambda and API Gateway, without managing any servers.
+The frontend is built using HTML, CSS, and JavaScript, and the backend is built using AWS Serverless services such as API Gateway, Lambda, and S3.
 
-🏗️ Architecture Overview
-Architecture Flow
+The main goal of this project is to understand how a frontend application can communicate with AWS cloud services to fetch and display data in real time.
+
+🖥 Application Preview (UI)
+
+This is the frontend Google Drive Clone interface showing files loaded from AWS S3.
+
+<img width="1919" height="867" alt="Screenshot 2026-02-05 002311" src="https://github.com/user-attachments/assets/b82b2e6d-3a13-490e-bb08-2b53d133f30c" />
+
+
+🏗 Architecture Diagram
+
+Below is the architecture used in this project:
+
 User
-  ↓
+   ↓
 Google Drive Clone UI (HTML, CSS, JavaScript)
-  ↓
+   ↓
 API Gateway
-  ↓
+   ↓
 Lambda Function
-  ↓
-Amazon S3 Bucket
+   ↓
+Amazon S3 Bucket (Cloud Storage)
 
-Explanation
+<img width="1536" height="1024" alt="ChatGPT Image Feb 4, 2026, 11_48_59 PM" src="https://github.com/user-attachments/assets/d70b57e7-6135-461d-bf37-b1208fe701fa" />
 
-The user opens the Google Drive Clone UI in the browser.
 
-The frontend UI sends a request to API Gateway.
+☁ Amazon S3 Bucket Preview
 
-API Gateway triggers a Lambda function.
+This shows the files stored inside the S3 bucket which are displayed in the UI.
 
-The Lambda function fetches file details from Amazon S3.
+<img width="1557" height="621" alt="Screenshot 2026-02-05 002410" src="https://github.com/user-attachments/assets/08ae4ebf-71d6-488d-84ba-0c240c72d4d4" />
 
-The list of files is returned and displayed in the UI.
 
-☁️ Cloud Services Used
+🌐 API Gateway Preview
 
-Amazon S3 – Cloud storage for files
+This shows the API Gateway configuration and deployed endpoints connected to Lambda.
 
-AWS Lambda – Backend logic (serverless)
+<img width="1556" height="622" alt="Screenshot 2026-02-05 002528" src="https://github.com/user-attachments/assets/964c3ec4-3ea4-4ee0-b70f-c69f77800570" />
 
-Amazon API Gateway – Connects frontend with Lambda
 
-AWS IAM – Permissions and security
+⚙ Technologies Used
+Frontend:
 
-HTML, CSS, JavaScript – Frontend UI
+HTML
 
-⚙️ Implementation Steps
-✅ Step 1: Create an S3 Bucket
+CSS
 
-Created an Amazon S3 bucket
+JavaScript
 
-Uploaded sample files (PDFs, documents)
+AWS Cloud Services:
 
-S3 acts as cloud storage, similar to Google Drive
+Amazon S3 (Storage)
 
-✅ Step 2: Create IAM Role
+AWS Lambda (Backend Logic)
 
-Created an IAM Role for Lambda
+API Gateway (API Connection)
 
-Attached policy:
+IAM Role (Permissions)
+
+🚀 How This Project Works
+Step 1 — Create S3 Bucket (Cloud Storage)
+
+I created an Amazon S3 bucket.
+
+Uploaded some sample files (PDF, images, documents).
+
+These files act as the cloud storage data.
+
+S3 is used as:
+
+Secure cloud storage
+
+Highly scalable
+
+Fast file access system
+
+Step 2 — Create IAM Role
+
+I created an IAM Role for Lambda.
+
+Attached permission:
 
 AmazonS3FullAccess
 
 
-This allows Lambda to read files from the S3 bucket
+This allows the Lambda function to:
 
-⚠️ Note: Full access is used only for learning purposes.
+Read files from S3
 
-✅ Step 3: Create Lambda Function
+List bucket objects
 
-Created a Lambda function (Python runtime)
+Generate download links
 
-Added logic to:
+Step 3 — Create Lambda Function
 
-Fetch file names from the S3 bucket
+I created a Lambda function using Python.
 
-Generate downloadable links when required
+Inside Lambda, I added logic to:
 
-Lambda acts as the backend server, without managing servers
+✅ Fetch file list from S3
+✅ Generate secure download URLs
+✅ Return data to API Gateway
 
-✅ Step 4: Create API Gateway
+Lambda acts as the backend server without managing any physical servers.
 
-Created an API Gateway REST API
+Step 4 — Create API Gateway
 
-Connected API Gateway to the Lambda function
+Created REST API in API Gateway.
 
-Created required resources and methods
+Created resources and methods.
 
-Enabled CORS (important for browser access)
+Connected API Gateway with Lambda function.
 
-Deployed the API to a stage (prod)
+Enabled CORS for browser access.
 
-✅ Step 5: Verify API Connection
+Deployed the API to a production stage.
 
-After deployment, API Gateway provided an Invoke URL
+After deployment, API Gateway provided an Invoke URL.
 
-Pasted the API URL in the browser
+Step 5 — API Testing
 
-If the browser showed:
+To verify everything is working:
 
-["file1.pdf", "file2.pdf"]
+I pasted the API URL directly into the browser.
 
+If the S3 files list appears → connection is successful ✅
 
-→ The connection between Lambda and S3 was successful
+If not → configuration issue ❌
 
-If no files appeared → the setup failed and needed fixing
+This step helped confirm:
 
-✅ Step 6: Connect API to Frontend
+Lambda is connected to S3
 
-Added the API Gateway URL in JavaScript
+API Gateway is working properly
 
-Used fetch() to call the API
+Step 6 — Frontend Integration
 
-Dynamically displayed file names in the UI
+I added the API Gateway URL inside JavaScript code.
 
-The UI updates automatically when files are added to S3
+The frontend fetches file data using the API.
 
+The UI dynamically displays files stored in S3.
 
-Project Use Case
+Now when users open the UI:
 
-Cloud storage demo
+✅ Files are loaded from cloud
+✅ Real-time data is displayed
+✅ Cloud storage is connected
 
-AWS beginner serverless project
+📂 Project Features
 
-Portfolio project for cloud & DevOps roles
-
-Understanding Google Drive–style architecture
+✔ Google Drive style UI
+✔ Real-time S3 file listing
+✔ Serverless backend
+✔ Secure cloud storage
+✔ No server management
+✔ Fully cloud-integrated architecture
