@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Drive Clone</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+</head>
+<style>
+    /* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f8f9fa;
+  color: #202124;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* App Layout */
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 256px;
+  background-color: #f1f3f4;
+  border-right: 1px solid #dadce0;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-header {
+  padding: 16px;
+}
+
+.new-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  transition: box-shadow 0.2s, background-color 0.2s;
+}
+
+.new-btn:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.16);
+  background-color: #f8f9fa;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  color: #5f6368;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: left;
+}
+
+.nav-item:hover {
+  background-color: #e8eaed;
+}
+
+.nav-item.active {
+  background-color: #e8f0fe;
+  color: #1a73e8;
+  font-weight: 500;
+}
+
+.storage-indicator {
+  padding: 16px;
+  border-top: 1px solid #dadce0;
+}
+
+.storage-bar {
+  height: 4px;
+  background-color: #dadce0;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.storage-fill {
+  height: 100%;
+  background-color: #1a73e8;
+  border-radius: 2px;
+}
+
+.storage-text {
+  font-size: 12px;
+  color: #5f6368;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  height: 64px;
+  padding: 0 16px;
+  background: #fff;
+  border-bottom: 1px solid #dadce0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.drive-logo {
+  height: 40px;
+  width: 40px;
+}
+
+.logo-text {
+  font-size: 22px;
+  color: #5f6368;
+  font-weight: 400;
+}
+
+.search-container {
+  flex: 1;
+  max-width: 720px;
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #5f6368;
+}
+
+.search-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px 0 48px;
+  background: #f1f3f4;
+  border: none;
+  border-radius: 24px;
+  font-size: 16px;
+  outline: none;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.search-input:focus {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.search-input::placeholder {
+  color: #5f6368;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #5f6368;
+  transition: background-color 0.2s;
+}
+
+.icon-btn:hover {
+  background-color: #f1f3f4;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  background: #1a73e8;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: #5f6368;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.breadcrumb:hover {
+  background-color: #e8eaed;
+}
+
+.breadcrumb.active {
+  color: #202124;
+  font-weight: 500;
+}
+
+.breadcrumb-separator {
+  color: #5f6368;
+}
+
+/* File Container */
+.file-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 24px 24px;
+}
+
+/* File Grid */
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.file-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.file-card:hover {
+  background-color: #e8eaed;
+}
+
+.file-card.selected {
+  background-color: #e8f0fe;
+}
+
+.file-icon-container {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f3f4;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.file-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.star-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #f4b400;
+}
+
+.file-name {
+  font-size: 14px;
+  text-align: center;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* File List */
+.file-list {
+  width: 100%;
+}
+
+.file-list-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #dadce0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #5f6368;
+}
+
+.file-list-row {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin: 0 -8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.file-list-row:hover {
+  background-color: #e8eaed;
+}
+
+.file-list-row.selected {
+  background-color: #e8f0fe;
+}
+
+.col-name {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.col-name .file-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.col-name span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.col-owner,
+.col-modified,
+.col-size {
+  font-size: 14px;
+  color: #5f6368;
+  text-align: right;
+}
+
+.col-owner { width: 120px; }
+.col-modified { width: 140px; }
+.col-size { width: 100px; }
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  color: #5f6368;
+}
+
+.empty-state svg {
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.empty-subtitle {
+  font-size: 14px;
+}
+
+/* File Type Colors */
+.icon-folder { color: #5f6368; }
+.icon-document { color: #4285f4; }
+.icon-spreadsheet { color: #0f9d58; }
+.icon-presentation { color: #f4b400; }
+.icon-pdf { color: #ea4335; }
+.icon-image { color: #a142f4; }
+.icon-video { color: #e91e63; }
+.icon-audio { color: #ff5722; }
+.icon-code { color: #00bcd4; }
+.icon-other { color: #5f6368; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+  
+  .header-logo {
+    min-width: auto;
+  }
+  
+  .logo-text {
+    display: none;
+  }
+  
+  .file-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
+</style>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <button class="new-btn" id="newBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>New</span>
+        </button>
+        <input type="file" id="fileInput" multiple style="display:none">
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-section="my-drive">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <path d="M2 10h20"></path>
+          </svg>
+          <span>My Drive</span>
+        </button>
+        <button class="nav-item" data-section="shared">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>Shared with me</span>
+        </button>
+        <button class="nav-item" data-section="recent">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>Recent</span>
+        </button>
+        <button class="nav-item" data-section="starred">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <span>Starred</span>
+        </button>
+        <button class="nav-item" data-section="trash">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Trash</span>
+        </button>
+      </nav>
+      <div class="storage-indicator">
+        <div class="storage-bar">
+          <div class="storage-fill" style="width: 15%"></div>
+        </div>
+        <p class="storage-text">2.3 GB of 15 GB used</p>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-logo">
+          <svg viewBox="0 0 87.3 78" class="drive-logo">
+            <path d="M6.6 66.85L0 53.76 24.99 9.85h29.31L6.6 66.85z" fill="#0066DA"/>
+            <path d="M27.81 78L40.9 53.76 81.71 53.76 68.61 78z" fill="#00AC47"/>
+            <path d="M45.1 9.85L58.21 34.03 87.3 78 54.3 78z" fill="#EA4335"/>
+            <path d="M27.81 78L34.5 65.11 47.41 65.11 40.9 53.76z" fill="#00832D"/>
+            <path d="M45.1 9.85L34.5 65.11 47.41 65.11 58.21 34.03z" fill="#2684FC"/>
+            <path d="M40.9 53.76L54.3 78 68.61 78 81.71 53.76z" fill="#FFBA00"/>
+          </svg>
+          <span class="logo-text">Drive</span>
+        </div>
+        <div class="search-container">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" placeholder="Search in Drive" class="search-input" id="searchInput">
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" title="Settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+          <div class="avatar">U</div>
+        </div>
+      </header>
+
+      <!-- Breadcrumbs -->
+      <nav class="breadcrumbs" id="breadcrumbs">
+        <span class="breadcrumb active">My Drive</span>
+      </nav>
+
+      <!-- File Grid -->
+      <div class="file-container" id="fileContainer">
+        <div class="file-grid" id="fileGrid"></div>
+        <div class="file-list" id="fileList" style="display:none"></div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="emptyState" style="display:none">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6H12L10 4Z"></path>
+        </svg>
+        <p class="empty-title">No files or folders</p>
+        <p class="empty-subtitle">Drop files here or use the New button</p>
+      </div>
+    </main>
+  </div>
+
+  <script>
+const API_URL = "https://wgpalmzzt5.execute-api.us-east-1.amazonaws.com/prod";
+
+
+   
+// State
+let items = [];
+let currentFolderId = null;
+let selectedItems = new Set();
+let viewMode = 'grid';
+let activeSection = 'my-drive';
+let searchQuery = '';
+
+// DOM Elements
+const fileGrid = document.getElementById('fileGrid');
+const fileList = document.getElementById('fileList');
+const emptyState = document.getElementById('emptyState');
+const searchInput = document.getElementById('searchInput');
+const newBtn = document.getElementById('newBtn');
+const fileInput = document.getElementById('fileInput');
+const breadcrumbs = document.getElementById('breadcrumbs');
+const navItems = document.querySelectorAll('.nav-item');
+
+// Icons SVG
+const icons = {
+    folder: `<svg viewBox="0 0 24 24" fill="currentColor" class="file-icon icon-folder"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`,
+    document: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="file-icon icon-document"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+    spreadsheet: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="file-icon icon-spreadsheet"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>`,
+    presentation: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="file-icon icon-presentation"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+    pdf: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="file-icon icon-pdf"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`,
+    image: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="file-icon icon-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`,
+    video: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="file-icon icon-video"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>`,
+    audio: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="file-icon icon-audio"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+    code: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="file-icon icon-code"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
+    other: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="file-icon icon-other"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`,
+    star: `<svg viewBox="0 0 24 24" fill="currentColor" class="star-badge"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
+};
+
+// Utility Functions
+function formatFileSize(bytes) {
+    if (!bytes) return '-';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+}
+
+function formatDate(date) {
+    const now = new Date();
+    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+
+    return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+    });
+}
+
+// Upload helpers
+function mapExtToType(ext) {
+  const images = ['jpg','jpeg','png','gif','webp','svg'];
+  const docs = ['doc','docx','txt','md'];
+  const spreadsheets = ['xls','xlsx','csv'];
+  const presentations = ['ppt','pptx'];
+  const pdfs = ['pdf'];
+  const videos = ['mp4','mov','avi','mkv','webm'];
+  const audios = ['mp3','wav','ogg'];
+  const code = ['html','css','js','py','java','c','cpp','cs','json','xml'];
+  if (images.includes(ext)) return 'image';
+  if (docs.includes(ext)) return 'document';
+  if (spreadsheets.includes(ext)) return 'spreadsheet';
+  if (presentations.includes(ext)) return 'presentation';
+  if (pdfs.includes(ext)) return 'pdf';
+  if (videos.includes(ext)) return 'video';
+  if (audios.includes(ext)) return 'audio';
+  if (code.includes(ext)) return 'code';
+  return 'other';
+}
+
+function handleFilesUpload(e) {
+  const files = Array.from(e.target.files || []);
+  if (files.length === 0) return;
+
+  files.forEach(f => {
+    const id = 'file-' + Date.now() + '-' + Math.random().toString(36).slice(2,7);
+    const ext = (f.name.split('.').pop() || '').toLowerCase();
+    const type = mapExtToType(ext);
+    const newItem = {
+      id,
+      name: f.name,
+      type,
+      parentId: currentFolderId,
+      starred: false,
+      owner: 'me',
+      modifiedAt: new Date(),
+      size: f.size
+    };
+
+    // Add to the start of items so uploaded files appear first
+    items.unshift(newItem);
+  });
+
+  render();
+  fileInput.value = '';
+}
+
+// Filter Items
+function getFilteredItems() {
+    let filtered = items;
+
+    switch (activeSection) {
+        case 'my-drive':
+            filtered = filtered.filter(item => item.parentId === currentFolderId);
+            break;
+        case 'starred':
+            filtered = filtered.filter(item => item.starred);
+            break;
+        case 'recent':
+            filtered = [...filtered].sort((a, b) => b.modifiedAt - a.modifiedAt).slice(0, 20);
+            break;
+        case 'shared':
+            filtered = filtered.filter(item => item.owner !== 'me');
+            break;
+        case 'trash':
+            filtered = []; // No trash in this demo
+            break;
+    }
+
+    if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        filtered = items.filter(item => item.name.toLowerCase().includes(query));
+    }
+
+    // Sort: folders first, then by name
+    return filtered.sort((a, b) => {
+        if (a.type === 'folder' && b.type !== 'folder') return -1;
+        if (a.type !== 'folder' && b.type === 'folder') return 1;
+        return a.name.localeCompare(b.name);
+    });
+}
+
+// Render Grid View
+function renderGrid(filteredItems) {
+    if (filteredItems.length === 0) {
+        fileGrid.style.display = 'none';
+        emptyState.style.display = 'flex';
+        return;
+    }
+
+    emptyState.style.display = 'none';
+    fileGrid.style.display = 'grid';
+
+    fileGrid.innerHTML = filteredItems.map(item => `
+    <div class="file-card ${selectedItems.has(item.id) ? 'selected' : ''}" data-id="${item.id}">
+      <div class="file-icon-container">
+        ${icons[item.type] || icons.other}
+      </div>
+      <div class="file-name">${item.name}</div>
+    </div>
+  `).join('');
+
+    // Add click handlers
+    fileGrid.querySelectorAll('.file-card').forEach(card => {
+        card.addEventListener('click', (e) => handleItemClick(card.dataset.id, e));
+        card.addEventListener('dblclick', () => handleItemDoubleClick(card.dataset.id));
+    });
+}
+
+// Render List View
+function renderList(filteredItems) {
+    if (filteredItems.length === 0) {
+        fileList.style.display = 'none';
+        emptyState.style.display = 'flex';
+        return;
+    }
+
+    emptyState.style.display = 'none';
+    fileList.style.display = 'block';
+
+    fileList.innerHTML = `
+    <div class="file-list-header">
+      <div class="col-name">Name</div>
+      <div class="col-owner">Owner</div>
+      <div class="col-modified">Last modified</div>
+      <div class="col-size">File size</div>
+    </div>
+    ${filteredItems.map(item => `
+      <div class="file-list-row ${selectedItems.has(item.id) ? 'selected' : ''}" data-id="${item.id}">
+        <div class="col-name">
+          ${icons[item.type] || icons.other}
+          <span>${item.name}</span>
+        </div>
+        <div class="col-owner">${item.owner}</div>
+        <div class="col-modified">${formatDate(item.modifiedAt)}</div>
+        <div class="col-size">${item.type === 'folder' ? '-' : formatFileSize(item.size)}</div>
+      </div>
+    `).join('')}
+  `;
+
+    // Add click handlers
+    fileList.querySelectorAll('.file-list-row').forEach(row => {
+        row.addEventListener('click', (e) => handleItemClick(row.dataset.id, e));
+        row.addEventListener('dblclick', () => handleItemDoubleClick(row.dataset.id));
+    });
+}
+
+// Render based on view mode
+function render() {
+    const filteredItems = getFilteredItems();
+
+    if (viewMode === 'grid') {
+        fileList.style.display = 'none';
+        renderGrid(filteredItems);
+    } else {
+        fileGrid.style.display = 'none';
+        renderList(filteredItems);
+    }
+
+    renderBreadcrumbs();
+}
+
+// Render Breadcrumbs
+function renderBreadcrumbs() {
+    if (activeSection !== 'my-drive') {
+        const labels = {
+            'starred': 'Starred',
+            'recent': 'Recent',
+            'shared': 'Shared with me',
+            'trash': 'Trash'
+        };
+        breadcrumbs.innerHTML = `<span class="breadcrumb active">${labels[activeSection]}</span>`;
+        return;
+    }
+
+    const path = [];
+    let folderId = currentFolderId;
+
+    while (folderId) {
+        const folder = items.find(item => item.id === folderId);
+        if (folder) {
+            path.unshift(folder);
+            folderId = folder.parentId;
+        } else {
+            break;
+        }
+    }
+
+    breadcrumbs.innerHTML = `
+    <span class="breadcrumb ${path.length === 0 ? 'active' : ''}" data-id="null">My Drive</span>
+    ${path.map((folder, i) => `
+      <span class="breadcrumb-separator">›</span>
+      <span class="breadcrumb ${i === path.length - 1 ? 'active' : ''}" data-id="${folder.id}">${folder.name}</span>
+    `).join('')}
+  `;
+
+    // Add click handlers
+    breadcrumbs.querySelectorAll('.breadcrumb').forEach(crumb => {
+        crumb.addEventListener('click', () => {
+            const id = crumb.dataset.id;
+            currentFolderId = id === 'null' ? null : id;
+            selectedItems.clear();
+            render();
+        });
+    });
+}
+
+// Event Handlers
+function handleItemClick(id, e) {
+    if (e.ctrlKey || e.metaKey) {
+        if (selectedItems.has(id)) {
+            selectedItems.delete(id);
+        } else {
+            selectedItems.add(id);
+        }
+    } else {
+        selectedItems.clear();
+        selectedItems.add(id);
+    }
+    render();
+}
+
+function handleItemDoubleClick(id) {
+
+  const item = items.find(i => i.id === id);
+
+  if (item.type === 'folder') {
+    currentFolderId = item.id;
+    selectedItems.clear();
+    activeSection = 'my-drive';
+    updateNavActive();
+    render();
+  } else {
+    // FILE DOWNLOAD
+    downloadFromCloud(item.name);
+  }
+}
+
+
+function updateNavActive() {
+    navItems.forEach(nav => {
+        nav.classList.toggle('active', nav.dataset.section === activeSection);
+    });
+}
+
+// Initialize Event Listeners
+function init() {
+    // Search
+    searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        render();
+    });
+
+    // Upload: open file picker and handle selected files
+    newBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', handleFilesUpload);
+
+    // Navigation
+    navItems.forEach(nav => {
+        nav.addEventListener('click', () => {
+            activeSection = nav.dataset.section;
+            if (activeSection === 'my-drive') {
+                currentFolderId = null;
+            }
+            selectedItems.clear();
+            updateNavActive();
+            render();
+        });
+    });
+
+    // Click outside to deselect
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.file-card') && !e.target.closest('.file-list-row')) {
+            selectedItems.clear();
+            render();
+        }
+    });
+
+    // Initial render
+    render();
+}
+
+// Start
+init();
+
+
+async function downloadFromCloud(fileName) {
+
+  const response = await fetch(`${API_URL}/download?file=${fileName}`);
+  const url = await response.json();
+
+  window.open(url); // Opens S3 download link
+}
+
+
+async function loadFilesFromCloud() {
+
+  const response = await fetch(API_URL);
+  const data = await response.json();
+
+  items = data.map(name => ({
+    id: name,
+    name: name,
+    type: name.endsWith(".pdf") ? "pdf" : "document",
+    parentId: null,
+    starred: false,
+    owner: "me",
+    modifiedAt: new Date(),
+    size: 0
+  }));
+
+  render();
+}
+
+
+// Load files from AWS S3
+loadFilesFromCloud();
+
+
+
+
+
+
+
+
+
+
+  </script>
+</body>
+</html>
